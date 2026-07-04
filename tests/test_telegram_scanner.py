@@ -1,5 +1,6 @@
 import asyncio
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 from models import Channel
 from telegram.scanner import TelegramScanner
@@ -15,6 +16,8 @@ class FakeFile:
 
 @dataclass(slots=True)
 class FakeMessage:
+    id: int
+    date: datetime
     file: FakeFile | None = None
 
 
@@ -40,11 +43,27 @@ def test_scanner_streams_messages_and_counts_files() -> None:
 
 
 async def _scan_messages_and_count_files() -> None:
+    first_date = datetime(2026, 1, 1, tzinfo=UTC)
+    second_date = datetime(2026, 1, 2, tzinfo=UTC)
+    third_date = datetime(2026, 1, 3, tzinfo=UTC)
+    fourth_date = datetime(2026, 1, 4, tzinfo=UTC)
     messages = [
-        FakeMessage(),
-        FakeMessage(FakeFile("clip.mp4", ".mp4", 100)),
-        FakeMessage(FakeFile("book.pdf", ".pdf", 200)),
-        FakeMessage(FakeFile(None, ".jpg", 300)),
+        FakeMessage(1, first_date),
+        FakeMessage(
+            2,
+            second_date,
+            FakeFile("clip.mp4", ".mp4", 100, "video/mp4"),
+        ),
+        FakeMessage(
+            3,
+            third_date,
+            FakeFile("book.pdf", ".pdf", 200, "application/pdf"),
+        ),
+        FakeMessage(
+            4,
+            fourth_date,
+            FakeFile(None, ".jpg", 300, "image/jpeg"),
+        ),
     ]
     service = FakeService(messages)
     scanner = TelegramScanner(service)
@@ -71,6 +90,17 @@ async def _scan_messages_and_count_files() -> None:
     assert result.images == 1
     assert result.completed is True
     assert result.completed_at is not None
+    assert len(result.files) == 3
+    assert result.files[0].message_id == 2
+    assert result.files[0].file_name == "clip.mp4"
+    assert result.files[0].category == "videos"
+    assert result.files[0].extension == ".mp4"
+    assert result.files[0].size == 100
+    assert result.files[0].date == second_date
+    assert result.files[0].mime_type == "video/mp4"
+    assert result.files[0].channel_id == 123
+    assert result.files[2].file_name == "telegram-file-4.jpg"
+    assert result.files[2].category == "images"
 
 
 def test_scanner_reports_progress_every_250_messages_and_at_completion() -> None:
@@ -78,8 +108,12 @@ def test_scanner_reports_progress_every_250_messages_and_at_completion() -> None
 
 
 async def _report_progress_every_250_messages_and_at_completion() -> None:
+    message_date = datetime(2026, 1, 1, tzinfo=UTC)
     service = FakeService(
-        [FakeMessage() for _ in range(251)]
+        [
+            FakeMessage(index, message_date)
+            for index in range(251)
+        ]
     )
     scanner = TelegramScanner(service)
     channel = Channel(

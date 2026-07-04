@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
+from models.file_info import FileInfo
+
 
 def utc_now() -> datetime:
     return datetime.now(UTC)
@@ -32,6 +34,7 @@ class ScanResult:
     completed_at: datetime | None = None
 
     completed: bool = False
+    files: list[FileInfo] = field(default_factory=list)
 
     @property
     def size_mb(self) -> float:

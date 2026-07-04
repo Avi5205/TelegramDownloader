@@ -1,7 +1,8 @@
 from collections.abc import Callable
 from datetime import UTC, datetime
+from pathlib import Path
 
-from models import Channel, ScanResult
+from models import Channel, FileInfo, ScanResult
 from telegram.client import TelegramService
 from utils.file_classifier import classify
 
@@ -32,7 +33,9 @@ class TelegramScanner:
         )
 
         async for message in self._service.iter_messages(entity):
-            self._update_result(result, message)
+            file_info = self._build_file_info(channel, message)
+
+            self._update_result(result, file_info)
 
             if (
                 progress_callback is not None
@@ -51,38 +54,77 @@ class TelegramScanner:
     def _update_result(
         self,
         result: ScanResult,
-        message,
+        file_info: FileInfo | None,
     ) -> None:
         result.total_messages += 1
         result.scanned_messages += 1
 
-        file_info = self._classify(message)
-
         if file_info is None:
             return
 
-        category, size = file_info
-
+        result.files.append(file_info)
         result.total_files += 1
-        result.total_size += size
+        result.total_size += file_info.size
 
         setattr(
             result,
-            category,
-            getattr(result, category) + 1,
+            file_info.category,
+            getattr(result, file_info.category) + 1,
         )
 
-    def _classify(self, message) -> tuple[str, int] | None:
+    def _build_file_info(
+        self,
+        channel: Channel,
+        message,
+    ) -> FileInfo | None:
         file = getattr(message, "file", None)
 
         if file is None:
             return None
 
-        filename = (
-            getattr(file, "name", None)
-            or getattr(file, "ext", None)
-            or getattr(file, "mime_type", None)
-        )
+        message_id = getattr(message, "id")
+        extension = self._extension(file)
+        file_name = self._file_name(file, message_id, extension)
         size = getattr(file, "size", 0) or 0
+        mime_type = getattr(file, "mime_type", None)
+        date = getattr(message, "date", None) or datetime.now(UTC)
 
-        return classify(filename), size
+        return FileInfo(
+            message_id=message_id,
+            file_name=file_name,
+            category=classify(file_name or extension or mime_type),
+            extension=extension,
+            size=size,
+            date=date,
+            mime_type=mime_type,
+            channel_id=channel.id,
+        )
+
+    def _file_name(
+        self,
+        file,
+        message_id: int,
+        extension: str,
+    ) -> str:
+        file_name = getattr(file, "name", None)
+
+        if file_name:
+            return file_name
+
+        return f"telegram-file-{message_id}{extension}"
+
+    def _extension(
+        self,
+        file,
+    ) -> str:
+        extension = getattr(file, "ext", None)
+
+        if extension:
+            return extension.lower()
+
+        file_name = getattr(file, "name", None)
+
+        if file_name:
+            return Path(file_name).suffix.lower()
+
+        return ""

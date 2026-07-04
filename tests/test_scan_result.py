@@ -12,6 +12,7 @@ def test_scan_result_defaults() -> None:
     assert result.total_messages == 0
     assert result.scanned_messages == 0
     assert result.total_files == 0
+    assert result.files == []
     assert result.started_at is not None
     assert result.completed_at is None
     assert result.completed is False
