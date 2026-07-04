@@ -1,3 +1,5 @@
+import asyncio
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -12,13 +14,20 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from models import Channel
+from models import Channel, ScanResult
+from telegram.scanner import TelegramScanner
 from ui.widgets.channel_details_widget import ChannelDetailsWidget
+from utils.logger import logger
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(
+        self,
+        scanner: TelegramScanner,
+    ):
         super().__init__()
+
+        self._scanner = scanner
 
         self.setWindowTitle("Telegram Downloader")
         self.resize(1400, 850)
@@ -27,6 +36,7 @@ class MainWindow(QMainWindow):
 
         self._all_channels: list[Channel] = []
         self._selected_channel_id: int | None = None
+        self._scan_task: asyncio.Task | None = None
 
         self._build_ui()
 
@@ -62,9 +72,6 @@ class MainWindow(QMainWindow):
         self.channels.currentItemChanged.connect(
             self._on_current_item_changed
         )
-        self.channels.itemDoubleClicked.connect(
-            self._on_channel_double_clicked
-        )
 
         self.channel_header = QLabel("Channels (0)")
         self.channel_header.setObjectName("channelHeader")
@@ -78,6 +85,9 @@ class MainWindow(QMainWindow):
         channels_layout.addWidget(self.channels)
 
         self.details = ChannelDetailsWidget()
+        self.details.scan_requested.connect(
+            self._on_scan_requested
+        )
         self.details.clear()
 
         body.addWidget(channels_column, 1)
@@ -164,17 +174,85 @@ class MainWindow(QMainWindow):
 
     # ------------------------------------------------------------------
 
-    def _on_channel_double_clicked(
+    async def _scan_channel(
         self,
-        item: QListWidgetItem,
+        channel: Channel,
     ) -> None:
 
-        channel = item.data(Qt.ItemDataRole.UserRole)
+        logger.info("Starting scan of %s", channel.title)
+        self.details.set_scanning(True)
+        self.statusBar().showMessage(
+            f"Scanning {channel.title}..."
+        )
 
-        if isinstance(channel, Channel):
-            print(
-                f"Scanning '{channel.title}'..."
+        try:
+            result = await self._scanner.scan_channel(
+                channel,
+                progress_callback=self._on_scan_progress,
             )
+
+        except Exception:
+            logger.exception(
+                "Scan failed for %s",
+                channel.title,
+            )
+            self.statusBar().showMessage(
+                f"Scan failed: {channel.title}"
+            )
+
+        else:
+            logger.info(
+                "Scan completed: %s",
+                result,
+            )
+
+            if self._selected_channel_id == channel.id:
+                self.details.set_scan_result(result)
+
+            self.statusBar().showMessage(
+                f"Scan completed | {result.total_files} files | "
+                f"{result.human_size}"
+            )
+
+        finally:
+            self.details.set_scanning(False)
+
+            if self._scan_task is asyncio.current_task():
+                self._scan_task = None
+
+    # ------------------------------------------------------------------
+
+    def _on_scan_requested(
+        self,
+        channel: Channel,
+    ) -> None:
+
+        if self._scan_task is not None and not self._scan_task.done():
+            self.statusBar().showMessage(
+                "A scan is already running"
+            )
+            return
+
+        self._scan_task = asyncio.create_task(
+            self._scan_channel(channel)
+        )
+
+    # ------------------------------------------------------------------
+
+    def _on_scan_progress(
+        self,
+        result: ScanResult,
+    ) -> None:
+
+        if self._selected_channel_id == result.channel_id:
+            self.details.set_scan_result(result)
+
+        self.statusBar().showMessage(
+            f"Scanning {result.channel_name} | "
+            f"{result.scanned_messages} messages | "
+            f"{result.total_files} files | "
+            f"{result.human_size}"
+        )
 
     # ------------------------------------------------------------------
 
@@ -186,3 +264,6 @@ class MainWindow(QMainWindow):
         self._selected_channel_id = channel.id
 
         self.details.set_channel(channel)
+
+        if self._scan_task is not None and not self._scan_task.done():
+            self.details.set_scanning(True)

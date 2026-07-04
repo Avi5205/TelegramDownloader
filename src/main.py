@@ -6,20 +6,21 @@ from qasync import QEventLoop
 
 from telegram.client import TelegramService
 from telegram.repository import TelegramRepository
+from telegram.scanner import TelegramScanner
 from ui.main_window import MainWindow
 from utils.logger import logger
 
 
-async def initialize(window: MainWindow) -> None:
-    telegram = TelegramService()
-
+async def initialize(
+    window: MainWindow,
+    telegram: TelegramService,
+    repository: TelegramRepository,
+) -> None:
     await telegram.connect()
 
     me = await telegram.me()
 
     logger.info("Connected as %s", me.first_name)
-
-    repository = TelegramRepository(telegram)
 
     channels = await repository.get_channels()
 
@@ -34,12 +35,17 @@ def main() -> None:
 
     asyncio.set_event_loop(loop)
 
-    window = MainWindow()
+    telegram = TelegramService()
+
+    repository = TelegramRepository(telegram)
+    scanner = TelegramScanner(telegram)
+
+    window = MainWindow(scanner)
     window.show()
 
     with loop:
         loop.create_task(
-            initialize(window)
+            initialize(window, telegram, repository)
         )
         loop.run_forever()
 

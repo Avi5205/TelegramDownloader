@@ -17,7 +17,7 @@ class TelegramRepository:
 
         channels: list[Channel] = []
 
-        async for dialog in self._service.client.iter_dialogs():
+        async for dialog in self._service.iter_dialogs():
 
             entity = dialog.entity
 
