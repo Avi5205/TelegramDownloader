@@ -1,19 +1,81 @@
-.venv/
+# Python bytecode
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
+*$py.class
+
+# Virtual environments and local environment files
+.env
+.envrc
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Distribution and packaging
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+
+# Test and coverage output
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Type checkers and linters
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# IDEs and local editor state
+.idea/
+.vscode/
+.spyderproject
+.spyproject
+.ropeproject
+tempCodeRunnerFile.py
+
+# OS files
+.DS_Store
 *.DS_Store
 
+# Project runtime state
+database/
 downloads/
+logs/
 sessions/
 
-.vscode/
-.idea/
-
-.venv/
-.env
-
-logs/
-__pycache__/
-*.pyc
-.DS_Store
+# Telegram/session credentials and generated local state should stay local.
+*.session
+*.session-journal
