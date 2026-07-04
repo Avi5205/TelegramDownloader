@@ -1,0 +1,34 @@
+QMainWindow {
+    background-color: #f5f7fb;
+}
+
+QLabel#channelHeader {
+    font-weight: 600;
+    padding-bottom: 4px;
+}
+
+QLabel#detailsTitle {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+QListWidget {
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    background-color: white;
+}
+
+QLineEdit, QPushButton, QGroupBox {
+    border-radius: 6px;
+}
+
+QPushButton {
+    padding: 6px 10px;
+}
+
+QGroupBox {
+    border: 1px solid #d0d7de;
+    margin-top: 8px;
+    padding-top: 8px;
+    background-color: white;
+}

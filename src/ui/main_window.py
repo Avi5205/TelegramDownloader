@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QListWidget,
+    QListWidgetItem,
     QMainWindow,
     QPushButton,
     QStatusBar,
@@ -12,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from models import Channel
+from ui.widgets.channel_details_widget import ChannelDetailsWidget
 
 
 class MainWindow(QMainWindow):
@@ -19,56 +21,168 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Telegram Downloader")
-        self.resize(1200, 800)
+        self.resize(1400, 850)
 
         self.setStatusBar(QStatusBar())
+
+        self._all_channels: list[Channel] = []
+        self._selected_channel_id: int | None = None
 
         self._build_ui()
 
     def _build_ui(self) -> None:
-        """Create the application layout."""
-
         central = QWidget()
         self.setCentralWidget(central)
 
-        root = QVBoxLayout()
-        central.setLayout(root)
+        root = QVBoxLayout(central)
 
-        # Top toolbar
+        # ------------------------------------------------------------------
+        # Toolbar
+        # ------------------------------------------------------------------
+
         top = QHBoxLayout()
 
         self.search = QLineEdit()
         self.search.setPlaceholderText("Search channels...")
+        self.search.textChanged.connect(self._filter_channels)
 
-        self.refresh_button = QPushButton("Refresh")
+        self.refresh_button = QPushButton("Reload Telegram")
+        self.refresh_button.setEnabled(False)
 
         top.addWidget(self.search)
         top.addWidget(self.refresh_button)
 
-        # Main content
+        # ------------------------------------------------------------------
+        # Body
+        # ------------------------------------------------------------------
+
         body = QHBoxLayout()
 
         self.channels = QListWidget()
+        self.channels.currentItemChanged.connect(
+            self._on_current_item_changed
+        )
+        self.channels.itemDoubleClicked.connect(
+            self._on_channel_double_clicked
+        )
 
-        self.details = QLabel("Select a channel")
-        self.details.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.channel_header = QLabel("Channels (0)")
+        self.channel_header.setObjectName("channelHeader")
 
-        body.addWidget(self.channels, 1)
+        channels_column = QWidget()
+
+        channels_layout = QVBoxLayout(channels_column)
+        channels_layout.setContentsMargins(0, 0, 0, 0)
+
+        channels_layout.addWidget(self.channel_header)
+        channels_layout.addWidget(self.channels)
+
+        self.details = ChannelDetailsWidget()
+        self.details.clear()
+
+        body.addWidget(channels_column, 1)
         body.addWidget(self.details, 3)
 
         root.addLayout(top)
-        root.addLayout(body)
+        root.addLayout(body, 1)
+
+        self.search.setFocus()
 
         self.statusBar().showMessage("Ready")
 
-    def load_channels(self, channels: list[Channel]) -> None:
-        """Populate the channel list."""
+    # ------------------------------------------------------------------
+
+    def load_channels(
+        self,
+        channels: list[Channel],
+    ) -> None:
+
+        self._all_channels = list(channels)
+
+        self._filter_channels()
+
+        self.statusBar().showMessage(
+            f"Connected | {len(channels)} Channels"
+        )
+
+    # ------------------------------------------------------------------
+
+    def _filter_channels(self) -> None:
+
+        query = self.search.text().strip().lower()
+
+        self.channels.setUpdatesEnabled(False)
 
         self.channels.clear()
 
-        for channel in channels:
-            self.channels.addItem(channel.display_name)
+        selected_item: QListWidgetItem | None = None
 
-        self.statusBar().showMessage(
-            f"{len(channels)} channels loaded"
+        for channel in self._all_channels:
+
+            if query and query not in channel.display_name.lower():
+                continue
+
+            item = QListWidgetItem(channel.display_name)
+            item.setData(
+                Qt.ItemDataRole.UserRole,
+                channel,
+            )
+
+            self.channels.addItem(item)
+
+            if channel.id == self._selected_channel_id:
+                selected_item = item
+
+        self.channels.setUpdatesEnabled(True)
+
+        self.channel_header.setText(
+            f"Channels ({self.channels.count()})"
         )
+
+        if selected_item is not None:
+            self.channels.setCurrentItem(selected_item)
+
+        elif self.channels.count() > 0:
+            self.channels.setCurrentRow(0)
+
+    # ------------------------------------------------------------------
+
+    def _on_current_item_changed(
+        self,
+        item: QListWidgetItem | None,
+    ) -> None:
+
+        if item is None:
+            self._selected_channel_id = None
+            self.details.clear()
+            return
+
+        channel = item.data(Qt.ItemDataRole.UserRole)
+
+        if isinstance(channel, Channel):
+            self._select_channel(channel)
+
+    # ------------------------------------------------------------------
+
+    def _on_channel_double_clicked(
+        self,
+        item: QListWidgetItem,
+    ) -> None:
+
+        channel = item.data(Qt.ItemDataRole.UserRole)
+
+        if isinstance(channel, Channel):
+            print(
+                f"Scanning '{channel.title}'..."
+            )
+
+    # ------------------------------------------------------------------
+
+    def _select_channel(
+        self,
+        channel: Channel,
+    ) -> None:
+
+        self._selected_channel_id = channel.id
+
+        self.details.set_channel(channel)
