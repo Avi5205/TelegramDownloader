@@ -1,89 +1,111 @@
-# Python bytecode
+# ============================================================================
+# Python
+# ============================================================================
+
 __pycache__/
 *.py[cod]
 *.pyo
 *$py.class
 
-# Virtual environments and local environment files
+# ============================================================================
+# Virtual Environments & Secrets
+# ============================================================================
+
 .env
 .envrc
+
 .venv/
-env/
 venv/
+env/
 ENV/
 env.bak/
 venv.bak/
 
-# Distribution and packaging
+# ============================================================================
+# Distribution / Packaging
+# ============================================================================
+
 .Python
 build/
-develop-eggs/
 dist/
+develop-eggs/
+downloads/
 eggs/
 .eggs/
 lib/
 lib64/
 parts/
 sdist/
+share/python-wheels/
 var/
 wheels/
-share/python-wheels/
+
+*.egg
 *.egg-info/
 .installed.cfg
-*.egg
 MANIFEST
 *.manifest
 *.spec
 
-# Test and coverage output
-htmlcov/
-.tox/
-.nox/
+# ============================================================================
+# Testing / Coverage
+# ============================================================================
+
 .coverage
 .coverage.*
-.cache/
-nosetests.xml
-coverage.xml
-*.cover
+.cover
 *.py.cover
-.hypothesis/
+
 .pytest_cache/
+.hypothesis/
+.tox/
+.nox/
+
+.cache/
+htmlcov/
+coverage.xml
+nosetests.xml
 cover/
 
-# Type checkers and linters
+# ============================================================================
+# Type Checkers / Linters
+# ============================================================================
+
 .mypy_cache/
-.dmypy.json
-dmypy.json
 .pyre/
 .pytype/
 .ruff_cache/
 
-# IDEs and local editor state
+dmypy.json
+.dmypy.json
+
+# ============================================================================
+# IDEs
+# ============================================================================
+
 .idea/
 .vscode/
+
 .spyderproject
 .spyproject
 .ropeproject
+
 tempCodeRunnerFile.py
 
-# OS files
-.DS_Store
-*.DS_Store
+# ============================================================================
+# Operating System
+# ============================================================================
 
-# Project runtime state
+.DS_Store
+Thumbs.db
+
+# ============================================================================
+# Project Runtime
+# ============================================================================
+
 database/
-downloads/
 logs/
 sessions/
 
-# Telegram/session credentials and generated local state should stay local.
 *.session
 *.session-journal
-# IDE and environment
-.venv/
-.idea/
-# macOS files
-.DS_Store
-# Telethon session files and secrets
-sessions/
-.env
