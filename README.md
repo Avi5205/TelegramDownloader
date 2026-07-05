@@ -555,9 +555,7 @@ MIT License
 
 **Avinash Kumar**
 
-GitHub:
-
-https://github.com/Avi5205
+GitHub: https://github.com/Avi5205
 
 ---
 
