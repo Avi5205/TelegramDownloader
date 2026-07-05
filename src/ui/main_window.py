@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import asyncio
+from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -12,6 +15,8 @@ from PySide6.QtWidgets import (
     QStatusBar,
     QVBoxLayout,
     QWidget,
+    QFileDialog,
+    QMessageBox,
 )
 
 from models import Channel, ScanResult
@@ -44,6 +49,7 @@ class MainWindow(QMainWindow):
         self._all_channels: list[Channel] = []
         self._selected_channel_id: int | None = None
         self._scan_task: asyncio.Task | None = None
+        self._download_task: asyncio.Task | None = None
 
         self._build_ui()
 
@@ -285,9 +291,6 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("No files selected to download")
             return
 
-        from PySide6.QtWidgets import QFileDialog
-        from pathlib import Path
-
         folder = QFileDialog.getExistingDirectory(self, "Choose download folder")
         if not folder:
             return
@@ -325,8 +328,6 @@ class MainWindow(QMainWindow):
             )
 
             # Completion summary
-            from PySide6.QtWidgets import QMessageBox
-
             QMessageBox.information(
                 self,
                 "Download completed",
