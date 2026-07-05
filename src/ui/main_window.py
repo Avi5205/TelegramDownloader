@@ -292,8 +292,13 @@ class MainWindow(QMainWindow):
         if not folder:
             return
 
-        # Launch background task
-        asyncio.create_task(self._perform_download(files, Path(folder)))
+        # Prevent concurrent downloads
+        if getattr(self, "_download_task", None) is not None and not self._download_task.done():
+            self.statusBar().showMessage("A download is already running")
+            return
+
+        # Launch background task and track it so we can manage lifecycle
+        self._download_task = asyncio.create_task(self._perform_download(files, Path(folder)))
 
     async def _perform_download(self, files, destination: Path) -> None:
         if self._download_manager is None:
@@ -338,6 +343,10 @@ class MainWindow(QMainWindow):
             # Clear busy state and update status
             self._file_table.set_busy(False)
             self.statusBar().showMessage("Ready")
+
+            # Clear tracked download task if this is the running task
+            if getattr(self, "_download_task", None) is asyncio.current_task():
+                self._download_task = None
 
     # ------------------------------------------------------------------
 
