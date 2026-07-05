@@ -79,3 +79,11 @@ sessions/
 # Telegram/session credentials and generated local state should stay local.
 *.session
 *.session-journal
+# IDE and environment
+.venv/
+.idea/
+# macOS files
+.DS_Store
+# Telethon session files and secrets
+sessions/
+.env
