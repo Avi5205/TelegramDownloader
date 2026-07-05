@@ -6,7 +6,6 @@ from models import Channel, FileInfo, ScanResult
 from telegram.client import TelegramService
 from utils.file_classifier import classify
 
-
 ProgressCallback = Callable[[ScanResult], None]
 
 
@@ -19,9 +18,9 @@ class TelegramScanner:
         self._service = service
 
     async def scan_channel(
-        self,
-        channel: Channel,
-        progress_callback: ProgressCallback | None = None,
+            self,
+            channel: Channel,
+            progress_callback: ProgressCallback | None = None,
     ) -> ScanResult:
         result = ScanResult(
             channel_id=channel.id,
@@ -38,8 +37,8 @@ class TelegramScanner:
             self._update_result(result, file_info)
 
             if (
-                progress_callback is not None
-                and result.scanned_messages % 250 == 0
+                    progress_callback is not None
+                    and result.scanned_messages % 250 == 0
             ):
                 progress_callback(result)
 
@@ -52,9 +51,9 @@ class TelegramScanner:
         return result
 
     def _update_result(
-        self,
-        result: ScanResult,
-        file_info: FileInfo | None,
+            self,
+            result: ScanResult,
+            file_info: FileInfo | None,
     ) -> None:
         result.total_messages += 1
         result.scanned_messages += 1
@@ -73,9 +72,9 @@ class TelegramScanner:
         )
 
     def _build_file_info(
-        self,
-        channel: Channel,
-        message,
+            self,
+            channel: Channel,
+            message,
     ) -> FileInfo | None:
         file = getattr(message, "file", None)
 
@@ -101,10 +100,10 @@ class TelegramScanner:
         )
 
     def _file_name(
-        self,
-        file,
-        message_id: int,
-        extension: str,
+            self,
+            file,
+            message_id: int,
+            extension: str,
     ) -> str:
         file_name = getattr(file, "name", None)
 
@@ -114,8 +113,8 @@ class TelegramScanner:
         return f"telegram-file-{message_id}{extension}"
 
     def _extension(
-        self,
-        file,
+            self,
+            file,
     ) -> str:
         extension = getattr(file, "ext", None)
 

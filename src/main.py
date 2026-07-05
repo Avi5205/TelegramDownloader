@@ -12,9 +12,9 @@ from utils.logger import logger
 
 
 async def initialize(
-    window: MainWindow,
-    telegram: TelegramService,
-    repository: TelegramRepository,
+        window: MainWindow,
+        telegram: TelegramService,
+        repository: TelegramRepository,
 ) -> None:
     await telegram.connect()
 
@@ -28,7 +28,6 @@ async def initialize(
 
 
 def main() -> None:
-
     app = QApplication(sys.argv)
 
     loop = QEventLoop(app)

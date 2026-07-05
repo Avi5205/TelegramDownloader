@@ -138,8 +138,8 @@ class ChannelDetailsWidget(QWidget):
     # ------------------------------------------------------------------
 
     def set_channel(
-        self,
-        channel: Channel | None,
+            self,
+            channel: Channel | None,
     ) -> None:
 
         if channel is None:
@@ -191,8 +191,8 @@ class ChannelDetailsWidget(QWidget):
     # ------------------------------------------------------------------
 
     def set_scan_result(
-        self,
-        result: ScanResult,
+            self,
+            result: ScanResult,
     ) -> None:
 
         self.messages_value.setText(str(result.scanned_messages))
@@ -209,8 +209,8 @@ class ChannelDetailsWidget(QWidget):
     # ------------------------------------------------------------------
 
     def set_scanning(
-        self,
-        scanning: bool,
+            self,
+            scanning: bool,
     ) -> None:
 
         self.scan_button.setEnabled(

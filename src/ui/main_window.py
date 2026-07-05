@@ -22,8 +22,8 @@ from utils.logger import logger
 
 class MainWindow(QMainWindow):
     def __init__(
-        self,
-        scanner: TelegramScanner,
+            self,
+            scanner: TelegramScanner,
     ):
         super().__init__()
 
@@ -103,8 +103,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def load_channels(
-        self,
-        channels: list[Channel],
+            self,
+            channels: list[Channel],
     ) -> None:
 
         self._all_channels = list(channels)
@@ -158,8 +158,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _on_current_item_changed(
-        self,
-        item: QListWidgetItem | None,
+            self,
+            item: QListWidgetItem | None,
     ) -> None:
 
         if item is None:
@@ -175,8 +175,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     async def _scan_channel(
-        self,
-        channel: Channel,
+            self,
+            channel: Channel,
     ) -> None:
 
         logger.info("Starting scan of %s", channel.title)
@@ -223,8 +223,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _on_scan_requested(
-        self,
-        channel: Channel,
+            self,
+            channel: Channel,
     ) -> None:
 
         if self._scan_task is not None and not self._scan_task.done():
@@ -240,8 +240,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _on_scan_progress(
-        self,
-        result: ScanResult,
+            self,
+            result: ScanResult,
     ) -> None:
 
         if self._selected_channel_id == result.channel_id:
@@ -257,8 +257,8 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
 
     def _select_channel(
-        self,
-        channel: Channel,
+            self,
+            channel: Channel,
     ) -> None:
 
         self._selected_channel_id = channel.id

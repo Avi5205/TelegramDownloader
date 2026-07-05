@@ -11,10 +11,10 @@ LOGS_DIR = PROJECT_ROOT / "logs"
 RESOURCES_DIR = PROJECT_ROOT / "resources"
 
 for directory in (
-    SESSIONS_DIR,
-    DOWNLOADS_DIR,
-    DATABASE_DIR,
-    LOGS_DIR,
-    RESOURCES_DIR,
+        SESSIONS_DIR,
+        DOWNLOADS_DIR,
+        DATABASE_DIR,
+        LOGS_DIR,
+        RESOURCES_DIR,
 ):
     directory.mkdir(parents=True, exist_ok=True)

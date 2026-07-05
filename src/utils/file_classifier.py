@@ -46,7 +46,6 @@ ARCHIVE_EXTENSIONS = {
 
 
 def classify(filename: str | None) -> str:
-
     if not filename:
         return "others"
 

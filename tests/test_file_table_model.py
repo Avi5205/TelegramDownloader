@@ -71,6 +71,12 @@ def test_file_table_model_loads_files() -> None:
     assert model.data(model.index(0, 1)) == "Video"
 
 
+def test_empty_model() -> None:
+    model = FileTableModel()
+
+    assert model.rowCount() == 0
+
+
 def test_file_table_model_sorts_by_name_and_size() -> None:
     large_file = make_file(
         "Intro.mp4",
