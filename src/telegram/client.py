@@ -46,7 +46,7 @@ class TelegramService:
 
         return await self._client.get_entity(entity_id)
 
-    async def download_media(self, file_info, destination: Path) -> int:
+    async def download_media(self, file_info: "FileInfo", destination: Path) -> int:
         """Download media for a given FileInfo to destination path.
 
         Returns number of bytes written.
@@ -57,8 +57,8 @@ class TelegramService:
         if not message:
             raise RuntimeError(f"Message {file_info.message_id} not found in {file_info.channel_id}")
 
-        # Telethon's download_media writes the file to 'destination' and returns the path
-        out = await self._client.download_media(message, file=str(destination))
+        # Telethon's download_media writes the file to 'destination'
+        await self._client.download_media(message, file=str(destination))
 
         # Ensure file exists and return its size
         if not destination.exists():
