@@ -5,7 +5,7 @@ import logging
 import time
 from datetime import timedelta
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Iterable, List
 
 from download.progress import DownloadProgress, DownloadResult
 from models import FileInfo
@@ -22,16 +22,21 @@ class DownloadManager:
     - Call TelegramService.download_media(file_info, destination)
     - Report progress via a callback
     - Return a DownloadResult summary
+
+    Note: TelegramService must be provided by the caller to ensure a single
+    Telethon client is used across the application.
     """
 
-    def __init__(self, telegram_service: Optional[TelegramService] = None):
-        self._telegram_service = telegram_service or TelegramService()
+    def __init__(self, telegram_service: TelegramService):
+        if telegram_service is None:
+            raise ValueError("telegram_service is required")
+        self._telegram_service = telegram_service
 
     async def download(
         self,
         files: Iterable[FileInfo],
         destination: Path,
-        progress_callback: Optional[Callable[[DownloadProgress], None]] = None,
+        progress_callback: Callable[[DownloadProgress], None] | None = None,
     ) -> DownloadResult:
         files_list: List[FileInfo] = list(files)
         total_files = len(files_list)

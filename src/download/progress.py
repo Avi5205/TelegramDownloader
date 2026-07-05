@@ -15,6 +15,7 @@ class DownloadResult:
 class DownloadProgress:
     current_file: str
     completed_files: int
+    failed_files: int
     total_files: int
     downloaded_bytes: int
     total_bytes: int
