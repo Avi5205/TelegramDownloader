@@ -22,13 +22,12 @@ from PySide6.QtWidgets import (
 from download.progress import DownloadProgress
 from models import Channel, ScanResult
 from telegram.scanner import TelegramScanner
-from ui.widgets.channel_details_widget import ChannelDetailsWidget
-from utils.logger import logger
-
+from ui.models.file_filter_proxy_model import FileFilterProxyModel
 # File table components (MainWindow owns models, widget is presentation-only)
 from ui.models.file_table_model import FileTableModel
-from ui.models.file_filter_proxy_model import FileFilterProxyModel
+from ui.widgets.channel_details_widget import ChannelDetailsWidget
 from ui.widgets.file_table_widget import FileTableWidget
+from utils.logger import logger
 
 
 class MainWindow(QMainWindow):

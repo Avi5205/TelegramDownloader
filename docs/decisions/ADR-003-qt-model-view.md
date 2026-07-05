@@ -6,7 +6,9 @@ Accepted
 
 ## Context
 
-The file table in TGVault needed to support features like searching, filtering, sorting, and multi-selection. Qt provides a Model-View architecture specifically designed for this use case, which separates data representation from presentation.
+The file table in TGVault needed to support features like searching, filtering, sorting, and multi-selection. Qt
+provides a Model-View architecture specifically designed for this use case, which separates data representation from
+presentation.
 
 ## Decision
 

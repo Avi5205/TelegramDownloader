@@ -23,8 +23,8 @@ class FakeMessage:
 
 class FakeService:
     def __init__(
-        self,
-        messages: list[FakeMessage],
+            self,
+            messages: list[FakeMessage],
     ):
         self.messages = messages
         self.requested_entity_id = None

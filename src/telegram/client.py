@@ -1,5 +1,6 @@
-from telethon import TelegramClient
 from pathlib import Path
+
+from telethon import TelegramClient
 
 from config.paths import SESSIONS_DIR
 from config.settings import (

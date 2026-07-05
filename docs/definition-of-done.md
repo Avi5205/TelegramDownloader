@@ -160,7 +160,7 @@ Every completed issue must satisfy its specific DoD before merge.
 
 **Objective:** Load channel list and files from database on startup.
 
-- [ ] `MainWindow.__init__` calls `load_channels_from_cache()` 
+- [ ] `MainWindow.__init__` calls `load_channels_from_cache()`
 - [ ] `load_channels_from_cache()` loads from database (not API)
 - [ ] FileTableModel populated from cached files immediately
 - [ ] TTL-based cache validation: rescan if `last_scanned_at < now() - 7 days`

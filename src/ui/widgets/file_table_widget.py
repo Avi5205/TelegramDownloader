@@ -1,6 +1,6 @@
 from typing import Optional
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -13,8 +13,8 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 
-from models.file_category import CATEGORY_LABELS, CATEGORY_ORDER
 from models import FileInfo
+from models.file_category import CATEGORY_LABELS, CATEGORY_ORDER
 
 
 class FileTableWidget(QWidget):
@@ -177,4 +177,3 @@ class FileTableWidget(QWidget):
         self._category.setEnabled(not busy)
         self._download_button.setEnabled(not busy and len(self._table.selectionModel().selectedRows()) > 0)
         self._table.setEnabled(not busy)
-

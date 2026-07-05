@@ -2,7 +2,8 @@
 
 ## Overview
 
-TGVault is a desktop application for discovering, filtering, and downloading files from Telegram channels. The architecture is built on **clean layering**, **dependency injection**, and **strong typing**.
+TGVault is a desktop application for discovering, filtering, and downloading files from Telegram channels. The
+architecture is built on **clean layering**, **dependency injection**, and **strong typing**.
 
 ---
 
@@ -107,10 +108,14 @@ Wraps Telethon and provides a clean API to the application layer.
 ```python
 class TelegramService:
     async def connect()
-    async def me()
-    async def get_channels()
-    async def get_messages(channel_id, limit)
-    async def download_media(file_info, destination)
+
+        async def me()
+
+        async def get_channels()
+
+        async def get_messages(channel_id, limit)
+
+        async def download_media(file_info, destination)
 ```
 
 ### TelegramScanner (Application Service)
@@ -141,6 +146,7 @@ class Channel:
     id: int
     title: str
     username: str
+
 
 @dataclass
 class FileInfo:

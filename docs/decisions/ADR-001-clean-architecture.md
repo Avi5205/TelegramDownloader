@@ -6,7 +6,9 @@ Accepted
 
 ## Context
 
-TGVault needed a structure that could scale from a simple Telethon wrapper to a full desktop application without major refactoring. The application needed clear separation between user interface, business logic, and external service integration.
+TGVault needed a structure that could scale from a simple Telethon wrapper to a full desktop application without major
+refactoring. The application needed clear separation between user interface, business logic, and external service
+integration.
 
 ## Decision
 

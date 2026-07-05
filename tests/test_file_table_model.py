@@ -7,11 +7,11 @@ from ui.models import FileTableModel
 
 
 def make_file(
-    file_name: str,
-    category: str,
-    extension: str,
-    size: int,
-    date: datetime,
+        file_name: str,
+        category: str,
+        extension: str,
+        size: int,
+        date: datetime,
 ) -> FileInfo:
     return FileInfo(
         message_id=1,

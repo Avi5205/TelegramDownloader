@@ -25,16 +25,15 @@ HEADERS: Final[tuple[str, ...]] = (
 )
 
 
-
 class FileTableModel(QAbstractTableModel):
     """
     Table model exposing scanned Telegram files.
     """
 
     def __init__(
-        self,
-        files: Iterable[FileInfo] | None = None,
-        parent=None,
+            self,
+            files: Iterable[FileInfo] | None = None,
+            parent=None,
     ):
         super().__init__(parent)
 
@@ -45,8 +44,8 @@ class FileTableModel(QAbstractTableModel):
     # ------------------------------------------------------------------
 
     def rowCount(
-        self,
-        parent: QModelIndex = QModelIndex(),
+            self,
+            parent: QModelIndex = QModelIndex(),
     ) -> int:
         if parent.isValid():
             return 0
@@ -54,8 +53,8 @@ class FileTableModel(QAbstractTableModel):
         return len(self._files)
 
     def columnCount(
-        self,
-        parent: QModelIndex = QModelIndex(),
+            self,
+            parent: QModelIndex = QModelIndex(),
     ) -> int:
         if parent.isValid():
             return 0
@@ -63,9 +62,9 @@ class FileTableModel(QAbstractTableModel):
         return len(HEADERS)
 
     def data(
-        self,
-        index: QModelIndex,
-        role: int = Qt.ItemDataRole.DisplayRole,
+            self,
+            index: QModelIndex,
+            role: int = Qt.ItemDataRole.DisplayRole,
     ):
         if not index.isValid():
             return None
@@ -96,10 +95,10 @@ class FileTableModel(QAbstractTableModel):
         return None
 
     def headerData(
-        self,
-        section: int,
-        orientation: Qt.Orientation,
-        role: int = Qt.ItemDataRole.DisplayRole,
+            self,
+            section: int,
+            orientation: Qt.Orientation,
+            role: int = Qt.ItemDataRole.DisplayRole,
     ):
         if role != Qt.ItemDataRole.DisplayRole:
             return None
@@ -114,15 +113,15 @@ class FileTableModel(QAbstractTableModel):
         return section + 1
 
     def flags(
-        self,
-        index: QModelIndex,
+            self,
+            index: QModelIndex,
     ) -> Qt.ItemFlag:
         if not index.isValid():
             return Qt.ItemFlag.NoItemFlags
 
         return (
-            Qt.ItemFlag.ItemIsEnabled
-            | Qt.ItemFlag.ItemIsSelectable
+                Qt.ItemFlag.ItemIsEnabled
+                | Qt.ItemFlag.ItemIsSelectable
         )
 
     # ------------------------------------------------------------------
@@ -130,8 +129,8 @@ class FileTableModel(QAbstractTableModel):
     # ------------------------------------------------------------------
 
     def load_files(
-        self,
-        files: Iterable[FileInfo],
+            self,
+            files: Iterable[FileInfo],
     ) -> None:
 
         self.beginResetModel()
@@ -141,9 +140,9 @@ class FileTableModel(QAbstractTableModel):
         self.endResetModel()
 
     def sort(
-        self,
-        column: int,
-        order: Qt.SortOrder = Qt.SortOrder.AscendingOrder,
+            self,
+            column: int,
+            order: Qt.SortOrder = Qt.SortOrder.AscendingOrder,
     ) -> None:
 
         if not 0 <= column < len(HEADERS):
@@ -157,15 +156,15 @@ class FileTableModel(QAbstractTableModel):
                 Columns(column),
             ),
             reverse=(
-                order == Qt.SortOrder.DescendingOrder
+                    order == Qt.SortOrder.DescendingOrder
             ),
         )
 
         self.endResetModel()
 
     def file_at(
-        self,
-        row: int,
+            self,
+            row: int,
     ) -> FileInfo | None:
 
         if 0 <= row < len(self._files):
@@ -181,9 +180,9 @@ class FileTableModel(QAbstractTableModel):
     # ------------------------------------------------------------------
 
     def _display_value(
-        self,
-        file_info: FileInfo,
-        column: Columns,
+            self,
+            file_info: FileInfo,
+            column: Columns,
     ) -> str:
 
         if column == Columns.NAME:
@@ -208,14 +207,14 @@ class FileTableModel(QAbstractTableModel):
         return ""
 
     def _sort_value(
-        self,
-        file_info: FileInfo,
-        column: Columns,
+            self,
+            file_info: FileInfo,
+            column: Columns,
     ):
 
         if column == Columns.NAME:
             return (
-                file_info.file_name or ""
+                    file_info.file_name or ""
             ).lower()
 
         if column == Columns.CATEGORY:
@@ -225,7 +224,7 @@ class FileTableModel(QAbstractTableModel):
 
         if column == Columns.EXTENSION:
             return (
-                file_info.extension or ""
+                    file_info.extension or ""
             ).lower()
 
         if column == Columns.SIZE:
@@ -237,30 +236,30 @@ class FileTableModel(QAbstractTableModel):
         return ""
 
     def _alignment(
-        self,
-        column: Columns,
+            self,
+            column: Columns,
     ) -> Qt.AlignmentFlag:
 
         if column == Columns.SIZE:
             return (
-                Qt.AlignmentFlag.AlignRight
-                | Qt.AlignmentFlag.AlignVCenter
+                    Qt.AlignmentFlag.AlignRight
+                    | Qt.AlignmentFlag.AlignVCenter
             )
 
         if column == Columns.DATE:
             return (
-                Qt.AlignmentFlag.AlignCenter
-                | Qt.AlignmentFlag.AlignVCenter
+                    Qt.AlignmentFlag.AlignCenter
+                    | Qt.AlignmentFlag.AlignVCenter
             )
 
         return (
-            Qt.AlignmentFlag.AlignLeft
-            | Qt.AlignmentFlag.AlignVCenter
+                Qt.AlignmentFlag.AlignLeft
+                | Qt.AlignmentFlag.AlignVCenter
         )
 
     @staticmethod
     def _display_category(
-        category: str,
+            category: str,
     ) -> str:
         return CATEGORY_LABELS.get(
             category,

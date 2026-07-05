@@ -33,10 +33,10 @@ class DownloadManager:
         self._telegram_service = telegram_service
 
     async def download(
-        self,
-        files: Iterable[FileInfo],
-        destination: Path,
-        progress_callback: Callable[[DownloadProgress], None] | None = None,
+            self,
+            files: Iterable[FileInfo],
+            destination: Path,
+            progress_callback: Callable[[DownloadProgress], None] | None = None,
     ) -> DownloadResult:
         files_list: List[FileInfo] = list(files)
         total_files = len(files_list)

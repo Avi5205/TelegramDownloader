@@ -20,9 +20,9 @@ class BlockingScanner:
         self.release = asyncio.Event()
 
     async def scan_channel(
-        self,
-        channel: Channel,
-        progress_callback=None,
+            self,
+            channel: Channel,
+            progress_callback=None,
     ) -> ScanResult:
         self.calls += 1
         await self.release.wait()

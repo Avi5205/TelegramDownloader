@@ -6,11 +6,14 @@ Accepted
 
 ## Context
 
-The Telethon client is stateful and manages the Telegram connection, session, and entity cache. The application needed a way to share this single connection across multiple features (scanning, downloading, repository queries) without creating multiple instances or exposing Telethon directly.
+The Telethon client is stateful and manages the Telegram connection, session, and entity cache. The application needed a
+way to share this single connection across multiple features (scanning, downloading, repository queries) without
+creating multiple instances or exposing Telethon directly.
 
 ## Decision
 
-We created a single `TelegramService` instance that wraps the Telethon client. All other components depend on this single instance via dependency injection.
+We created a single `TelegramService` instance that wraps the Telethon client. All other components depend on this
+single instance via dependency injection.
 
 ```
 main.py
@@ -41,7 +44,8 @@ main.py
 
 ## Alternatives Considered
 
-1. **Multiple Instances**: Create a new client per operation. Rejected: wasteful, loses entity cache, harder to manage connections.
+1. **Multiple Instances**: Create a new client per operation. Rejected: wasteful, loses entity cache, harder to manage
+   connections.
 2. **Global Singleton**: Use `TelegramService.instance()`. Rejected: less testable, harder to inject mocks.
 3. **Dependency on Telethon**: Pass Telethon client directly. Rejected: couples business logic to Telethon API.
 

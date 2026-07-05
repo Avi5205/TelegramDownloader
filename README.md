@@ -17,13 +17,14 @@ TGVault is a desktop application built with **PySide6** and **Telethon** that al
 - Scan media without downloading it
 - Search and filter files instantly
 - View metadata such as:
-  - File name
-  - Size
-  - Category
-  - Date
+    - File name
+    - Size
+    - Category
+    - Date
 - Download selected files to your local machine
 
-The application follows a clean layered architecture and is designed to scale with future features such as persistence, download queues, resume support, and advanced search.
+The application follows a clean layered architecture and is designed to scale with future features such as persistence,
+download queues, resume support, and advanced search.
 
 ---
 
@@ -72,17 +73,17 @@ Download
 
 # Tech Stack
 
-| Layer | Technology |
-|---------|------------|
-| Language | Python 3.13 |
-| GUI | PySide6 |
-| Telegram API | Telethon |
-| Async Runtime | asyncio + qasync |
-| Architecture | Clean Architecture |
-| Design | SOLID |
-| Pattern | Repository Pattern |
-| Pattern | Dependency Injection |
-| Pattern | Model/View (Qt) |
+| Layer         | Technology           |
+|---------------|----------------------|
+| Language      | Python 3.13          |
+| GUI           | PySide6              |
+| Telegram API  | Telethon             |
+| Async Runtime | asyncio + qasync     |
+| Architecture  | Clean Architecture   |
+| Design        | SOLID                |
+| Pattern       | Repository Pattern   |
+| Pattern       | Dependency Injection |
+| Pattern       | Model/View (Qt)      |
 
 ---
 

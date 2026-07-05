@@ -134,7 +134,8 @@ class MainWindow(QMainWindow):
 
 **What it means:**
 
-The UI should not import or directly use database, network, or file system code. Always go through a service or repository.
+The UI should not import or directly use database, network, or file system code. Always go through a service or
+repository.
 
 **Example (❌ Avoid):**
 
@@ -434,7 +435,8 @@ They exist to:
 - Make the project enjoyable to work on
 - Enable the team to move fast without fear of breaking things
 
-Follow them. When you encounter a situation where they conflict, explicitly document why you're making an exception. (Exceptions are sometimes necessary; blindly following principles is also a mistake.)
+Follow them. When you encounter a situation where they conflict, explicitly document why you're making an exception. (
+Exceptions are sometimes necessary; blindly following principles is also a mistake.)
 
 Over time, these principles become instinct. You'll write code that naturally follows them without thinking about it.
 

@@ -1,5 +1,5 @@
-from typing import Optional, Tuple, Final
 import sys
+from typing import Optional, Tuple, Final
 
 from PySide6.QtCore import QSortFilterProxyModel, Qt, QModelIndex
 
@@ -64,9 +64,9 @@ class FileFilterProxyModel(QSortFilterProxyModel):
             return super().filterAcceptsRow(source_row, source_parent)
 
         return (
-            self._matches_category(file_info)
-            and self._matches_size(file_info)
-            and self._matches_search(file_info)
+                self._matches_category(file_info)
+                and self._matches_size(file_info)
+                and self._matches_search(file_info)
         )
 
     # ------------------------- Match helpers ---------------------------------
