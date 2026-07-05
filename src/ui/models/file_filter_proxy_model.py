@@ -1,6 +1,9 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Final
+import sys
 
 from PySide6.QtCore import QSortFilterProxyModel, Qt, QModelIndex
+
+MAX_SIZE: Final[int] = sys.maxsize
 
 
 class FileFilterProxyModel(QSortFilterProxyModel):
@@ -36,7 +39,7 @@ class FileFilterProxyModel(QSortFilterProxyModel):
         else:
             self._size_range = (
                 0 if min_bytes is None else int(min_bytes),
-                2 ** 63 - 1 if max_bytes is None else int(max_bytes),
+                MAX_SIZE if max_bytes is None else int(max_bytes),
             )
         self.invalidateFilter()
 
@@ -60,34 +63,43 @@ class FileFilterProxyModel(QSortFilterProxyModel):
             # If the source model doesn't provide FileInfo, fall back to default behaviour.
             return super().filterAcceptsRow(source_row, source_parent)
 
-        # Category filter
-        if self._category:
-            if getattr(file_info, "category", None) != self._category:
-                return False
+        return (
+            self._matches_category(file_info)
+            and self._matches_size(file_info)
+            and self._matches_search(file_info)
+        )
 
-        # Size range filter
-        if self._size_range is not None:
-            min_b, max_b = self._size_range
-            size = getattr(file_info, "size", 0)
-            if size < min_b or size > max_b:
-                return False
+    # ------------------------- Match helpers ---------------------------------
+    def _matches_category(self, file_info) -> bool:
+        if self._category is None:
+            return True
 
-        # Search text filter (applied to name, extension, and category)
-        if self._search_text:
-            hay = " ".join(
-                [
-                    str(getattr(file_info, "file_name", "")),
-                    str(getattr(file_info, "extension", "") or ""),
-                    str(getattr(file_info, "category", "") or ""),
-                ]
-            ).lower()
+        return file_info.category == self._category
 
-            if self._search_text not in hay:
-                return False
+    def _matches_size(self, file_info) -> bool:
+        if self._size_range is None:
+            return True
 
-        return True
+        min_b, max_b = self._size_range
+        size = file_info.size
+        return min_b <= size <= max_b
 
-    # Optional: expose convenient properties
+    def _matches_search(self, file_info) -> bool:
+        if not self._search_text:
+            return True
+
+        # Search across fields likely to be useful: name, extension, category, mime_type
+        parts = [
+            file_info.file_name or "",
+            (file_info.extension or ""),
+            (file_info.category or ""),
+            (file_info.mime_type or ""),
+        ]
+
+        hay = " ".join(parts).lower()
+        return self._search_text in hay
+
+    # ------------------------- Convenience accessors -----------------------
     def search_text(self) -> str:
         return self._search_text
 
