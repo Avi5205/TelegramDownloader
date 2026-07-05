@@ -39,7 +39,11 @@ def main() -> None:
     repository = TelegramRepository(telegram)
     scanner = TelegramScanner(telegram)
 
-    window = MainWindow(scanner)
+    from download.manager import DownloadManager
+
+    download_manager = DownloadManager(telegram)
+
+    window = MainWindow(scanner, download_manager)
     window.show()
 
     with loop:

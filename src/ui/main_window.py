@@ -29,10 +29,12 @@ class MainWindow(QMainWindow):
     def __init__(
             self,
             scanner: TelegramScanner,
+            download_manager=None,
     ):
         super().__init__()
 
         self._scanner = scanner
+        self._download_manager = download_manager
 
         self.setWindowTitle("Telegram Downloader")
         self.resize(1400, 850)
@@ -99,6 +101,8 @@ class MainWindow(QMainWindow):
         self._file_table_model = FileTableModel()
         self._file_filter_proxy = FileFilterProxyModel()
         self._file_table = FileTableWidget(self._file_table_model, self._file_filter_proxy)
+        # Wire download signal from widget to MainWindow handler
+        self._file_table.download_requested.connect(self._on_download_requested)
 
         body.addWidget(channels_column, 1)
         body.addWidget(self.details, 3)
@@ -266,6 +270,74 @@ class MainWindow(QMainWindow):
             f"{result.total_files} files | "
             f"{result.human_size}"
         )
+
+    # ------------------------------------------------------------------
+    # Download flow
+    # ------------------------------------------------------------------
+    def _on_download_requested(self) -> None:
+        """Handler when the FileTableWidget signals a download request.
+
+        This method prompts the user for a destination folder and launches an
+        asynchronous download task handled by DownloadManager.
+        """
+        files = self._file_table.selected_files()
+        if not files:
+            self.statusBar().showMessage("No files selected to download")
+            return
+
+        from PySide6.QtWidgets import QFileDialog
+        from pathlib import Path
+
+        folder = QFileDialog.getExistingDirectory(self, "Choose download folder")
+        if not folder:
+            return
+
+        # Launch background task
+        asyncio.create_task(self._perform_download(files, Path(folder)))
+
+    async def _perform_download(self, files, destination: Path) -> None:
+        if self._download_manager is None:
+            self.statusBar().showMessage("Download manager is not configured")
+            return
+
+        # Mark UI busy
+        self._file_table.set_busy(True)
+
+        from download.progress import DownloadProgress
+
+        def progress_cb(progress: DownloadProgress) -> None:
+            # Simple status bar update
+            self.statusBar().showMessage(
+                f"Downloading {progress.completed_files}/{progress.total_files}: {progress.current_file}"
+                f" (failed: {progress.failed_files})"
+            )
+
+        try:
+            result = await self._download_manager.download(
+                files,
+                destination,
+                progress_callback=progress_cb,
+            )
+
+            # Completion summary
+            from PySide6.QtWidgets import QMessageBox
+
+            QMessageBox.information(
+                self,
+                "Download completed",
+                (
+                    f"Files: {result.total_files}\n"
+                    f"Succeeded: {result.downloaded_files}\n"
+                    f"Failed: {result.failed_files}\n"
+                    f"Downloaded bytes: {result.total_bytes}\n"
+                    f"Elapsed: {result.elapsed}"
+                ),
+            )
+
+        finally:
+            # Clear busy state and update status
+            self._file_table.set_busy(False)
+            self.statusBar().showMessage("Ready")
 
     # ------------------------------------------------------------------
 

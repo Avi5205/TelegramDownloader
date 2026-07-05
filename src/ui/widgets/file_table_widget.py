@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QTableView,
     QLabel,
     QSizePolicy,
+    QPushButton,
 )
 
 from models.file_category import CATEGORY_LABELS, CATEGORY_ORDER
@@ -27,9 +28,11 @@ class FileTableWidget(QWidget):
     - Provide a search box and category combo
     - Expose a small footer showing visible/total counts
     - Emit file_activated(FileInfo) on double-click
+    - Emit download_requested() when user requests a download
     """
 
     file_activated: Signal = Signal(object)
+    download_requested: Signal = Signal()
 
     def __init__(self, model, proxy, parent: Optional[QWidget] = None):
         super().__init__(parent)
@@ -43,6 +46,7 @@ class FileTableWidget(QWidget):
         self._build_ui()
         self._connect_signals()
         self._update_footer()
+        self._update_download_button()
 
     # ---------------- UI construction ---------------------------------
     def _build_ui(self) -> None:
@@ -68,6 +72,11 @@ class FileTableWidget(QWidget):
 
         toolbar.addWidget(self._search)
         toolbar.addWidget(self._category)
+
+        # Download button (MainWindow will handle actual download orchestration)
+        self._download_button = QPushButton("Download Selected")
+        self._download_button.setEnabled(False)
+        toolbar.addWidget(self._download_button)
 
         # Table view
         self._table = QTableView()
@@ -104,9 +113,13 @@ class FileTableWidget(QWidget):
         sel_model = self._table.selectionModel()
         if sel_model is not None:
             sel_model.selectionChanged.connect(self._update_footer)
+            sel_model.selectionChanged.connect(self._update_download_button)
 
         # Activation
         self._table.doubleClicked.connect(self._on_activated)
+
+        # Download button
+        self._download_button.clicked.connect(lambda: self.download_requested.emit())
 
     # ---------------- Public API --------------------------------------
 
@@ -149,3 +162,19 @@ class FileTableWidget(QWidget):
             if fi is not None:
                 files.append(fi)
         return files
+
+    # ----------------- Download helpers ---------------------------------
+    def _update_download_button(self, *_) -> None:
+        sel_model = self._table.selectionModel()
+        enabled = False
+        if sel_model is not None:
+            enabled = len(sel_model.selectedRows()) > 0
+        self._download_button.setEnabled(enabled)
+
+    def set_busy(self, busy: bool) -> None:
+        """Disable interactive controls while a long-running operation runs."""
+        self._search.setEnabled(not busy)
+        self._category.setEnabled(not busy)
+        self._download_button.setEnabled(not busy and len(self._table.selectionModel().selectedRows()) > 0)
+        self._table.setEnabled(not busy)
+
