@@ -4,6 +4,7 @@ import sys
 from PySide6.QtWidgets import QApplication
 from qasync import QEventLoop
 
+from download.manager import DownloadManager
 from telegram.client import TelegramService
 from telegram.repository import TelegramRepository
 from telegram.scanner import TelegramScanner
@@ -38,9 +39,6 @@ def main() -> None:
 
     repository = TelegramRepository(telegram)
     scanner = TelegramScanner(telegram)
-
-    from download.manager import DownloadManager
-
     download_manager = DownloadManager(telegram)
 
     window = MainWindow(scanner, download_manager)

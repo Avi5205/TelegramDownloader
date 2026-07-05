@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
 )
 
+from download.progress import DownloadProgress
 from models import Channel, ScanResult
 from telegram.scanner import TelegramScanner
 from ui.widgets.channel_details_widget import ChannelDetailsWidget
@@ -310,8 +311,6 @@ class MainWindow(QMainWindow):
 
         # Mark UI busy
         self._file_table.set_busy(True)
-
-        from download.progress import DownloadProgress
 
         def progress_cb(progress: DownloadProgress) -> None:
             # Simple status bar update
