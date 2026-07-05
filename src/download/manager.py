@@ -53,6 +53,9 @@ class DownloadManager:
         dest = Path(destination)
         dest.mkdir(parents=True, exist_ok=True)
 
+        if not dest.is_dir():
+            raise ValueError(f"Destination {dest} is not a directory")
+
         downloaded_files = 0
         failed_files = 0
         downloaded_bytes = 0
@@ -60,7 +63,7 @@ class DownloadManager:
 
         start = time.monotonic()
 
-        for idx, file_info in enumerate(files_list, start=1):
+        for file_info in files_list:
             current_file_name = file_info.file_name or f"file_{file_info.message_id}"
 
             # emit progress before starting file
@@ -69,6 +72,7 @@ class DownloadManager:
                     DownloadProgress(
                         current_file=current_file_name,
                         completed_files=downloaded_files,
+                        failed_files=failed_files,
                         total_files=total_files,
                         downloaded_bytes=downloaded_bytes,
                         total_bytes=total_bytes,
@@ -78,12 +82,8 @@ class DownloadManager:
             try:
                 dest_path = dest / current_file_name
                 # Delegate actual download to TelegramService
-                # TelegramService.download_media is expected to write the file and return bytes written (or None)
+                # TelegramService.download_media is expected to write the file and return bytes written (int)
                 bytes_written = await self._telegram_service.download_media(file_info, dest_path)
-
-                if bytes_written is None:
-                    # if service doesn't return bytes count, conservatively use file_info.size
-                    bytes_written = file_info.size or 0
 
                 downloaded_files += 1
                 downloaded_bytes += int(bytes_written)
@@ -98,6 +98,7 @@ class DownloadManager:
                     DownloadProgress(
                         current_file=current_file_name,
                         completed_files=downloaded_files,
+                        failed_files=failed_files,
                         total_files=total_files,
                         downloaded_bytes=downloaded_bytes,
                         total_bytes=total_bytes,
