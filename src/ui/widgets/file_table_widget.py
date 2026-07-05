@@ -12,7 +12,8 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from models.file_category import CATEGORY_LABELS
+from models.file_category import CATEGORY_LABELS, CATEGORY_ORDER
+from models import FileInfo
 
 
 class FileTableWidget(QWidget):
@@ -59,9 +60,11 @@ class FileTableWidget(QWidget):
         self._category = QComboBox()
         self._category.addItem("All", None)
 
-        # Add categories from shared labels
-        for key, label in CATEGORY_LABELS.items():
-            self._category.addItem(label, key)
+        # Add categories using explicit ordering
+        for key in CATEGORY_ORDER:
+            label = CATEGORY_LABELS.get(key)
+            if label is not None:
+                self._category.addItem(label, key)
 
         toolbar.addWidget(self._search)
         toolbar.addWidget(self._category)
@@ -119,20 +122,14 @@ class FileTableWidget(QWidget):
     def _on_activated(self, proxy_index) -> None:
         # Map proxy index to source model index and retrieve FileInfo
         src_index = self._proxy.mapToSource(proxy_index)
-        # Request FileInfo via UserRole from source model (column 0)
-        idx = self._model.index(src_index.row(), 0)
-        file_info = self._model.data(idx, Qt.ItemDataRole.UserRole)
+        file_info = self._model.file_at(src_index.row())
         if file_info is not None:
             self.file_activated.emit(file_info)
 
     # ---------------- Helpers -----------------------------------------
     def _update_footer(self, *_) -> None:
-        try:
-            visible = self._proxy.rowCount()
-            total = self._model.rowCount()
-        except Exception:
-            visible = 0
-            total = 0
+        visible = self._proxy.rowCount()
+        total = self._model.rowCount()
 
         selected = 0
         sel_model = self._table.selectionModel()
@@ -140,3 +137,15 @@ class FileTableWidget(QWidget):
             selected = len(sel_model.selectedRows())
 
         self._footer_label.setText(f"Showing {visible} of {total} files    Selected: {selected}")
+
+    # ---------------- Selection helpers --------------------------------
+    def selected_files(self) -> list[FileInfo]:
+        """Return the list of selected FileInfo instances."""
+        sel = self._table.selectionModel().selectedRows()
+        files: list[FileInfo] = []
+        for proxy_idx in sel:
+            src_idx = self._proxy.mapToSource(proxy_idx)
+            fi = self._model.file_at(src_idx.row())
+            if fi is not None:
+                files.append(fi)
+        return files

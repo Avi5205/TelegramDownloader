@@ -19,6 +19,11 @@ from telegram.scanner import TelegramScanner
 from ui.widgets.channel_details_widget import ChannelDetailsWidget
 from utils.logger import logger
 
+# File table components (MainWindow owns models, widget is presentation-only)
+from ui.models.file_table_model import FileTableModel
+from ui.models.file_filter_proxy_model import FileFilterProxyModel
+from ui.widgets.file_table_widget import FileTableWidget
+
 
 class MainWindow(QMainWindow):
     def __init__(
@@ -91,17 +96,13 @@ class MainWindow(QMainWindow):
         self.details.clear()
 
         # File table models and widget (MainWindow owns data models; widget presents them)
-        from ui.models.file_table_model import FileTableModel
-        from ui.models.file_filter_proxy_model import FileFilterProxyModel
-        from ui.widgets.file_table_widget import FileTableWidget
-
         self._file_table_model = FileTableModel()
         self._file_filter_proxy = FileFilterProxyModel()
-        self.file_table = FileTableWidget(self._file_table_model, self._file_filter_proxy)
+        self._file_table = FileTableWidget(self._file_table_model, self._file_filter_proxy)
 
         body.addWidget(channels_column, 1)
         body.addWidget(self.details, 3)
-        body.addWidget(self.file_table, 4)
+        body.addWidget(self._file_table, 4)
 
         root.addLayout(top)
         root.addLayout(body, 1)
@@ -219,11 +220,7 @@ class MainWindow(QMainWindow):
             if self._selected_channel_id == channel.id:
                 self.details.set_scan_result(result)
                 # Update the file table model owned by MainWindow so the widget is presentation-only
-                try:
-                    self._file_table_model.load_files(result.files)
-                except Exception:
-                    # If model isn't available for some reason, log and continue
-                    logger.debug("File table model not available to load files")
+                self._file_table_model.load_files(result.files)
 
             self.statusBar().showMessage(
                 f"Scan completed | {result.total_files} files | "
