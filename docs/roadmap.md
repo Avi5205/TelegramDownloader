@@ -22,28 +22,46 @@
 
 ---
 
-## v0.2.0 🎯 Persistence
+## v0.2.0 🎯 Persistence — In Planning
 
 **SQLite integration for smart caching**
 
-- [ ] Database connection layer
-- [ ] Schema migrations (001_initial.sql)
-- [ ] ChannelRepository (cache channels)
-- [ ] FileRepository (cache file metadata)
-- [ ] ScanCache (avoid rescanning unchanged channels)
-- [ ] DownloadHistory (track downloaded files)
-- [ ] Persistence tests
+### Issues
 
-**Goals:**
+- [ ] **DB-001**: Database connection layer (aiosqlite wrapper with UnitOfWork)
+- [ ] **DB-002**: Migration engine (SQL migration system with tracking)
+- [ ] **DB-003**: Migration tests (verify schema integrity)
+- [ ] **DB-004**: ChannelRepository (cache channels)
+- [ ] **DB-005**: FileRepository (cache file metadata)
+- [ ] **DB-006**: DownloadRepository (track download history)
+- [ ] **DB-007**: Persist scan results (wire TelegramScanner)
+- [ ] **DB-008**: Load cached scans (offline mode on startup)
+- [ ] **DB-009**: Persist download history (record all downloads)
+- [ ] **DB-010**: Duplicate detection (skip already-downloaded files)
+- [ ] **DB-011**: Repository tests (comprehensive coverage)
+
+### Goals
 
 - Reduce API load by caching scan results
-- Skip rescanning channels that haven't changed
-- Build foundation for future features
+- Skip rescanning channels that haven't changed (TTL: 7 days)
+- Browse offline with cached data
+- Prevent duplicate downloads
+- Build foundation for queue, resume, favorites
 
-**Metrics:**
+### Key Technologies
 
-- Second scan of same channel takes <100ms
-- Download history prevents duplicate downloads
+- **aiosqlite**: Async SQLite wrapper
+- **UnitOfWork**: Transaction boundary pattern
+- **Protocols**: Define repository contracts before implementation
+- **Migrations**: SQL-based version control for schema
+- **aiosemaphore**: Serialize writes to SQLite
+
+### Metrics
+
+- Second scan of same channel: <100ms (cached)
+- First scan of 1000-file channel: ~2s (network-bound)
+- Offline browsing: instantly responsive
+- Download deduplication: <1ms lookup
 
 ---
 
@@ -156,9 +174,9 @@
 
 ### Q3 2026
 
-- v0.2.0 Persistence (2 weeks)
+- v0.2.0 Persistence (3 weeks)
 - v0.3.0 Download Engine (2 weeks)
-- v0.4.0 Power Features (2 weeks)
+- v0.4.0 Power Features (1 week)
 
 ### Q4 2026
 
@@ -168,3 +186,4 @@
 ### 2027+
 
 - Cloud and advanced features
+
