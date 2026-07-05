@@ -5,6 +5,7 @@ from typing import Final
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
 
 from models import FileInfo
+from models.file_category import CATEGORY_LABELS
 
 
 class Columns(IntEnum):
@@ -23,14 +24,6 @@ HEADERS: Final[tuple[str, ...]] = (
     "Date",
 )
 
-CATEGORY_LABELS: Final[dict[str, str]] = {
-    "videos": "Video",
-    "documents": "Document",
-    "images": "Image",
-    "audio": "Audio",
-    "archives": "Archive",
-    "others": "Other",
-}
 
 
 class FileTableModel(QAbstractTableModel):
