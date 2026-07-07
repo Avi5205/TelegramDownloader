@@ -358,5 +358,10 @@ class MainWindow(QMainWindow):
 
         self.details.set_channel(channel)
 
+        # Load any existing files from DB
+        files = self._file_repo.get_files_for_channel(channel.id)
+        if files:
+            self._file_table_model.load_files(files)
+
         if self._scan_task is not None and not self._scan_task.done():
             self.details.set_scanning(True)

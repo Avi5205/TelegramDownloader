@@ -10,6 +10,7 @@ from typing import Callable, Iterable, List
 from download.progress import DownloadProgress, DownloadResult
 from models import FileInfo
 from telegram.client import TelegramService
+from repositories.download_repository import DownloadRepository  # NEW
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class DownloadManager:
         if telegram_service is None:
             raise ValueError("telegram_service is required")
         self._telegram_service = telegram_service
+        self._download_repo = DownloadRepository()  # NEW
 
     async def download(
             self,
@@ -81,16 +83,30 @@ class DownloadManager:
 
             try:
                 dest_path = dest / current_file_name
-                # Delegate actual download to TelegramService
-                # TelegramService.download_media is expected to write the file and return bytes written (int)
                 bytes_written = await self._telegram_service.download_media(file_info, dest_path)
 
                 downloaded_files += 1
                 downloaded_bytes += int(bytes_written)
 
+                # record successful download (file_id None for now)
+                self._download_repo.record_download(
+                    file_id=None,
+                    destination=str(dest_path),
+                    status="success",
+                    bytes_written=int(bytes_written),
+                )
+
             except Exception as exc:  # Log and continue with next file
                 failed_files += 1
                 logger.exception("Failed to download %s: %s", current_file_name, exc)
+
+                # record failed download
+                self._download_repo.record_download(
+                    file_id=None,
+                    destination=str(dest / current_file_name),
+                    status="failed",
+                    bytes_written=0,
+                )
 
             # emit progress after finishing file
             if progress_callback:

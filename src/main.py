@@ -10,6 +10,7 @@ from telegram.repository import TelegramRepository
 from telegram.scanner import TelegramScanner
 from ui.main_window import MainWindow
 from utils.logger import logger
+from database.database import init_schema  # NEW
 
 
 async def initialize(
@@ -32,8 +33,10 @@ def main() -> None:
     app = QApplication(sys.argv)
 
     loop = QEventLoop(app)
-
     asyncio.set_event_loop(loop)
+
+    # Initialize SQLite schema
+    init_schema()
 
     telegram = TelegramService()
 

@@ -6,6 +6,9 @@ from models import Channel, FileInfo, ScanResult
 from telegram.client import TelegramService
 from utils.file_classifier import classify
 
+from repositories.file_repository import FileRepository  # NEW
+from repositories.scan_repository import ScanRepository  # NEW
+
 ProgressCallback = Callable[[ScanResult], None]
 
 
@@ -16,6 +19,8 @@ class TelegramScanner:
 
     def __init__(self, service: TelegramService):
         self._service = service
+        self._file_repo = FileRepository()      # NEW
+        self._scan_repo = ScanRepository()      # NEW
 
     async def scan_channel(
             self,
@@ -47,6 +52,17 @@ class TelegramScanner:
 
         if progress_callback is not None:
             progress_callback(result)
+
+        # Persist files and scan summary
+        if result.files:
+            self._file_repo.save_files(result.files)
+
+        self._scan_repo.save_scan_summary(
+            channel_id=result.channel_id,
+            scanned_at=result.completed_at,
+            total_files=result.total_files,
+            total_size=result.total_size,
+        )
 
         return result
 
