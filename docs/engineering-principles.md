@@ -72,10 +72,12 @@ class DownloadManager:
         # Only reason to change: download logic
         ...
 
+
 class FileRepository:
     async def save_files(self, files):
         # Only reason to change: database schema
         ...
+
 
 class FileTableModel:
     def update_files(self, files):
@@ -224,6 +226,7 @@ def _on_scan_clicked(self):
 def _on_scan_clicked(self):
     self._scan_task = asyncio.create_task(self._perform_scan())
 
+
 async def _perform_scan(self):
     result = await self._scanner.scan_channel(channel_id)
     self._file_table.update(result.files)
@@ -261,10 +264,10 @@ class FileDownloader:
 # Can test with simple callback
 class DownloadManager:
     async def download(
-        self,
-        files: list[FileInfo],
-        destination: Path,
-        progress_callback: Callable[[DownloadProgress], None] | None = None,
+            self,
+            files: list[FileInfo],
+            destination: Path,
+            progress_callback: Callable[[DownloadProgress], None] | None = None,
     ) -> DownloadResult:
         # ✅ Progress is optional callback, not UI-specific
         ...
@@ -301,6 +304,7 @@ class Scanner:
 ```python
 # Measure first
 import timeit
+
 
 async def scan_1000_files():
     start = timeit.default_timer()
@@ -374,6 +378,7 @@ When adding a feature that spans layers (e.g., persistence), design the contract
 class Database:
     ...
 
+
 # Halfway through, realize we need repositories
 class ChannelRepository:
     ...
@@ -388,7 +393,9 @@ class ChannelRepository:
 # Design interfaces first
 class ChannelRepository(Protocol):
     async def save(self, channel: Channel) -> None: ...
+
     async def find(self, channel_id: int) -> Channel | None: ...
+
 
 # Then implement against the interface
 class SqliteChannelRepository(ChannelRepository):

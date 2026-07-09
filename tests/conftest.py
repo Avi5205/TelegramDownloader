@@ -1,8 +1,8 @@
-import sys
-from pathlib import Path
+import pytest
 
-ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "src"
+from database.initializer import initialize_database
 
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+
+@pytest.fixture(scope="session", autouse=True)
+def initialize_test_database():
+    initialize_database()

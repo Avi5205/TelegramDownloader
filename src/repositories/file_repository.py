@@ -1,62 +1,95 @@
-from datetime import datetime
+from __future__ import annotations
+
 from typing import Iterable
 
-from database.database import get_connection
-from models import FileInfo
+from database.transaction import transaction
+from models.file_info import FileInfo
 
 
 class FileRepository:
-    def save_files(self, files: Iterable[FileInfo]) -> None:
-        conn = get_connection()
-        cur = conn.cursor()
+    """
+    Repository responsible for file persistence.
+    """
 
+    INSERT_SQL = """
+    INSERT OR IGNORE INTO files
+    (
+        message_id,
+        channel_id,
+        file_name,
+        extension,
+        mime_type,
+        category,
+        size,
+        date
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """
+
+    SELECT_BY_CHANNEL = """
+    SELECT
+        message_id,
+        channel_id,
+        file_name,
+        extension,
+        mime_type,
+        category,
+        size,
+        date
+    FROM files
+    WHERE channel_id = ?
+    ORDER BY date DESC
+    """
+
+    def save_files(
+            self,
+            files: Iterable[FileInfo],
+    ) -> None:
         rows = [
             (
-                f.message_id,
-                f.channel_id,
-                f.file_name,
-                f.extension,
-                f.mime_type,
-                f.category,
-                f.size,
-                f.date.isoformat(),
+                file.message_id,
+                file.channel_id,
+                file.file_name,
+                file.extension,
+                file.mime_type,
+                file.category,
+                file.size,
+                file.date.isoformat(),
             )
-            for f in files
+            for file in files
         ]
 
-        cur.executemany(
-            """
-            INSERT OR IGNORE INTO files (
-                message_id, channel_id, file_name, extension,
-                mime_type, category, size, date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            rows,
-        )
+        if not rows:
+            return
 
-        conn.commit()
-        conn.close()
+        with transaction() as conn:
+            conn.executemany(
+                self.INSERT_SQL,
+                rows,
+            )
 
-    def get_files_for_channel(self, channel_id: int) -> list[FileInfo]:
-        conn = get_connection()
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT * FROM files WHERE channel_id = ? ORDER BY date ASC",
-            (channel_id,),
-        )
-        rows = cur.fetchall()
-        conn.close()
+    def get_files_for_channel(
+            self,
+            channel_id: int,
+    ) -> list[FileInfo]:
+        with transaction() as conn:
+            cursor = conn.execute(
+                self.SELECT_BY_CHANNEL,
+                (channel_id,),
+            )
+
+            rows = cursor.fetchall()
 
         return [
             FileInfo(
                 message_id=row["message_id"],
-                file_name=row["file_name"],
-                category=row["category"],
-                extension=row["extension"],
-                size=row["size"],
-                date=datetime.fromisoformat(row["date"]),
-                mime_type=row["mime_type"],
                 channel_id=row["channel_id"],
+                file_name=row["file_name"],
+                extension=row["extension"],
+                mime_type=row["mime_type"],
+                category=row["category"],
+                size=row["size"],
+                date=row["date"],
             )
             for row in rows
         ]

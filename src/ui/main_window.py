@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 
 from download.progress import DownloadProgress
 from models import Channel, ScanResult
+from repositories.file_repository import FileRepository
 from telegram.scanner import TelegramScanner
 from ui.models.file_filter_proxy_model import FileFilterProxyModel
 # File table components (MainWindow owns models, widget is presentation-only)
@@ -35,11 +36,15 @@ class MainWindow(QMainWindow):
             self,
             scanner: TelegramScanner,
             download_manager=None,
+            file_repository: FileRepository | None = None,
     ):
         super().__init__()
 
         self._scanner = scanner
         self._download_manager = download_manager
+
+        # Temporary until dependency injection is fully implemented
+        self._file_repo = file_repository or FileRepository()
 
         self.setWindowTitle("Telegram Downloader")
         self.resize(1400, 850)

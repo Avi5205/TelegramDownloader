@@ -3,11 +3,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from models import Channel, FileInfo, ScanResult
-from telegram.client import TelegramService
-from utils.file_classifier import classify
-
 from repositories.file_repository import FileRepository  # NEW
 from repositories.scan_repository import ScanRepository  # NEW
+from telegram.client import TelegramService
+from utils.file_classifier import classify
 
 ProgressCallback = Callable[[ScanResult], None]
 
@@ -19,8 +18,8 @@ class TelegramScanner:
 
     def __init__(self, service: TelegramService):
         self._service = service
-        self._file_repo = FileRepository()      # NEW
-        self._scan_repo = ScanRepository()      # NEW
+        self._file_repo = FileRepository()  # NEW
+        self._scan_repo = ScanRepository()  # NEW
 
     async def scan_channel(
             self,

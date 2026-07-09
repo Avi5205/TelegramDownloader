@@ -4,13 +4,13 @@ import sys
 from PySide6.QtWidgets import QApplication
 from qasync import QEventLoop
 
+from database.initializer import initialize_database
 from download.manager import DownloadManager
 from telegram.client import TelegramService
 from telegram.repository import TelegramRepository
 from telegram.scanner import TelegramScanner
 from ui.main_window import MainWindow
 from utils.logger import logger
-from database.database import init_schema  # NEW
 
 
 async def initialize(
@@ -36,7 +36,7 @@ def main() -> None:
     asyncio.set_event_loop(loop)
 
     # Initialize SQLite schema
-    init_schema()
+    initialize_database()
 
     telegram = TelegramService()
 

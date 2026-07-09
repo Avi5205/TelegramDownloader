@@ -9,8 +9,8 @@ from typing import Callable, Iterable, List
 
 from download.progress import DownloadProgress, DownloadResult
 from models import FileInfo
-from telegram.client import TelegramService
 from repositories.download_repository import DownloadRepository  # NEW
+from telegram.client import TelegramService
 
 logger = logging.getLogger(__name__)
 
